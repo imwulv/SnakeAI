@@ -13,6 +13,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
 
     protected final int rectLength = 10;
     int score = 0;
+    int lifeTime =0;
     //设置Snake
     protected Snake snake;
     protected Food food;
@@ -185,7 +186,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
-    public void settingDirection(String paramDirection) {
+    public synchronized void settingDirection(String paramDirection) {
         if (!isFaild && isStarted) {
             if (paramDirection.equals("U") && !direction.equals("D") && directionSetFlag) {
                 direction = "U";
@@ -205,7 +206,8 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void doMove(){
-        if(!isFaild && isStarted){
+        if(!isFaild && isStarted && lifeTime < 200){
+
             if(direction.equals("R")){
                 snake.moveRight();
                 directionSetFlag = true;
@@ -232,6 +234,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
             //如果吃到食物
             if(snakeHeadX == food.x && snakeHeadY == food.y){
                 score++;
+                lifeTime = 0;
                 setFood();
             } else {
                 //如果没有吃到食物，尾部消失，相当于整体前移
@@ -241,7 +244,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
             //触壁死亡
             //地图的二维下标要倒转，因为蛇的x轴对应的是地图的第二个下标，y轴对应的是第一个下标
             if(orginMapList[snakeHeadY][snakeHeadX] == 1 ){
-                System.out.println("！！！触壁死亡！！！");
+                System.out.println("┌─触壁死亡─┐");
                 //输出触壁位置
                 System.out.println("触壁位置为：[" + snakeHeadY +"]["+snakeHeadX+"]");
                 isFaild = true;
@@ -250,7 +253,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
             //如果撞到自己
             for (int i = 1; i < snake.snakeNodes.size() ; i++) {
                 if (snakeHeadX == snake.snakeNodes.get(i).x && snakeHeadY == snake.snakeNodes.get(i).y){
-                    System.out.println("！！！自杀死亡！！！");
+                    System.out.println("┌─自杀死亡─┐");
                     isFaild = true;
                     break;
                 }
@@ -259,8 +262,9 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
             //蛇死亡时输出蛇的节点信息，以便调试。
             if (isFaild){
                 System.out.println(snake);
-                System.out.println("！！！#######！！！");
+                System.out.println("└─死亡信息─┘");
             }
+            lifeTime++;
             repaint();
         }
     }
