@@ -11,11 +11,11 @@ import java.util.Random;
 
 public class KeyboardControlSnakePanel extends JPanel implements KeyListener, ActionListener {
 
-    private final int rectLength = 10;
+    protected final int rectLength = 10;
     int score = 0;
     //设置Snake
-    private Snake snake;
-    private Food food;
+    protected Snake snake;
+    protected Food food;
     //设置Snake的基础长度
     boolean isStarted;
     boolean isFaild;
@@ -186,6 +186,72 @@ public class KeyboardControlSnakePanel extends JPanel implements KeyListener, Ac
         }
     }
 
+    public void settingDirection(String paramDirection) {
+        if (!direction.equals("D") && directionSetFlag){
+            direction = "U";
+            directionSetFlag = false;
+        } else if (!direction.equals("U") && directionSetFlag){
+            direction = "D";
+            directionSetFlag = false;
+        } else if (!direction.equals("R") && directionSetFlag){
+            direction = "L";
+            directionSetFlag = false;
+        } else if (!direction.equals("L") && directionSetFlag){
+            direction = "R";
+            directionSetFlag = false;
+        }
+        doMove();
+    }
+    private void doMove(){
+        if(direction.equals("R")){
+            snake.moveRight();
+            directionSetFlag = true;
+        }else if(direction.equals("L")){
+            snake.moveLeft();
+            directionSetFlag = true;
+        }else if(direction.equals("U")){
+            snake.moveUp();
+            directionSetFlag = true;
+        }else if(direction.equals("D")){
+            snake.moveDown();
+            directionSetFlag = true;
+        }
+        int snakeHeadX = snake.snakeNodes.getFirst().x;
+        int snakeHeadY = snake.snakeNodes.getFirst().y;
+
+        //如果吃到食物
+        if(snakeHeadX == food.x && snakeHeadY == food.y){
+            score++;
+            setFood();
+        } else {
+            //如果没有吃到食物，尾部消失，相当于整体前移
+            snake.snakeNodes.removeLast();
+        }
+
+        //触壁死亡
+        //地图的二维下标要倒转，因为蛇的x轴对应的是地图的第二个下标，y轴对应的是第一个下标
+        if(orginMapList[snakeHeadY][snakeHeadX] == 1 ){
+
+            System.out.println("！！！触壁死亡！！！");
+            System.out.println("orginMapList[" + snakeHeadY +"]["+snakeHeadX+"]");
+            isFaild = true;
+        }
+
+        //如果撞到自己
+        for (int i = 1; i < snake.snakeNodes.size() ; i++) {
+            if (snakeHeadX == snake.snakeNodes.get(i).x && snakeHeadY == snake.snakeNodes.get(i).y){
+                System.out.println("！！！自杀死亡！！！");
+                isFaild = true;
+                break;
+            }
+        }
+        if (isFaild){
+            System.out.println(snake);
+            System.out.println("！！！#######！！！");
+        }
+        repaint();
+
+    }
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
@@ -220,6 +286,7 @@ public class KeyboardControlSnakePanel extends JPanel implements KeyListener, Ac
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         /**
          * 0 = KeyEvent.VK_SPACE
          * 1 = KeyEvent.VK_UP
@@ -228,55 +295,8 @@ public class KeyboardControlSnakePanel extends JPanel implements KeyListener, Ac
          * 4 = KeyEvent.VK_RIGHT
          */
         if(isStarted && !isFaild){
-
-            if(direction.equals("R")){
-                snake.moveRight();
-                directionSetFlag = true;
-            }else if(direction.equals("L")){
-                snake.moveLeft();
-                directionSetFlag = true;
-            }else if(direction.equals("U")){
-                snake.moveUp();
-                directionSetFlag = true;
-            }else if(direction.equals("D")){
-                snake.moveDown();
-                directionSetFlag = true;
-            }
-            int snakeHeadX = snake.snakeNodes.getFirst().x;
-            int snakeHeadY = snake.snakeNodes.getFirst().y;
-
-            //如果吃到食物
-            if(snakeHeadX == food.x && snakeHeadY == food.y){
-                score++;
-                setFood();
-            } else {
-                //如果没有吃到食物，尾部消失，相当于整体前移
-                snake.snakeNodes.removeLast();
-            }
-
-            //触壁死亡
-            //地图的二维下标要倒转，因为蛇的x轴对应的是地图的第二个下标，y轴对应的是第一个下标
-            if(orginMapList[snakeHeadY][snakeHeadX] == 1 ){
-
-                System.out.println("！！！触壁死亡！！！");
-                System.out.println("orginMapList[" + snakeHeadY +"]["+snakeHeadX+"]");
-                isFaild = true;
-            }
-
-            //如果撞到自己
-            for (int i = 1; i < snake.snakeNodes.size() ; i++) {
-                if (snakeHeadX == snake.snakeNodes.get(i).x && snakeHeadY == snake.snakeNodes.get(i).y){
-                    System.out.println("！！！自杀死亡！！！");
-                    isFaild = true;
-                    break;
-                }
-            }
-            if (isFaild){
-                System.out.println(snake);
-                System.out.println("！！！#######！！！");
-            }
+            doMove();
         }
-        repaint();
     }
 
     @Override
