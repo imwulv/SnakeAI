@@ -2,15 +2,17 @@ package pers.wulv.snake;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Random;
 
 public class Main {
+    public static SnakeFrame snakeFrame = null;
     public static void main(String[] args){
 
         EventQueue.invokeLater(new Runnable(){
 
             @Override
             public void run() {
-                SnakeFrame snakeFrame = null;
+
                 try {
                     snakeFrame = new SnakeFrame();
                 } catch (AWTException e) {
@@ -19,10 +21,37 @@ public class Main {
                 snakeFrame.setVisible(true);
             }
         });
+
+        System.out.println("#####Snake Start#####");
+        Random r = new Random();
+        new Thread(()->{
+			while (true){
+                switch (r.nextInt(4)) {
+                    case 1:
+                        snakeFrame.kcSnakePanel.settingDirection("U");
+                        break;
+                    case 2:
+                        snakeFrame.kcSnakePanel.settingDirection("D");
+                        break;
+                    case 3:
+                        snakeFrame.kcSnakePanel.settingDirection("L");
+                        break;
+                    case 0:
+                        snakeFrame.kcSnakePanel.settingDirection("R");
+                        break;
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+		}).start();
+
     }
 }
 class SnakeFrame extends JFrame {
-    KeyboardControlSnakePanel kcSnakePanel = new KeyboardControlSnakePanel();
+    public static SnakePanel kcSnakePanel = new SnakePanel();
     JSplitPane jSplitPane =new JSplitPane();
     JPanel jPanel= new JPanel();
     JButton button = new JButton("Start AI");

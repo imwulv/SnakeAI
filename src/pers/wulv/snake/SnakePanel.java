@@ -9,7 +9,7 @@ import java.awt.event.KeyListener;
 import java.util.LinkedList;
 import java.util.Random;
 
-public class KeyboardControlSnakePanel extends JPanel implements KeyListener, ActionListener {
+public class SnakePanel extends JPanel implements KeyListener, ActionListener {
 
     protected final int rectLength = 10;
     int score = 0;
@@ -93,7 +93,7 @@ public class KeyboardControlSnakePanel extends JPanel implements KeyListener, Ac
 
 
     //构造函数
-    public KeyboardControlSnakePanel() {
+    public SnakePanel() {
         this.setFocusable(true);
         init();
         this.addKeyListener(this);
@@ -187,22 +187,26 @@ public class KeyboardControlSnakePanel extends JPanel implements KeyListener, Ac
     }
 
     public void settingDirection(String paramDirection) {
-        if (!direction.equals("D") && directionSetFlag){
-            direction = "U";
-            directionSetFlag = false;
-        } else if (!direction.equals("U") && directionSetFlag){
-            direction = "D";
-            directionSetFlag = false;
-        } else if (!direction.equals("R") && directionSetFlag){
-            direction = "L";
-            directionSetFlag = false;
-        } else if (!direction.equals("L") && directionSetFlag){
-            direction = "R";
-            directionSetFlag = false;
+        if (!isFaild && isStarted) {
+            if (paramDirection.equals("U") && !direction.equals("D") && directionSetFlag) {
+                direction = "U";
+                directionSetFlag = false;
+            } else if (paramDirection.equals("D") && !direction.equals("U") && directionSetFlag) {
+                direction = "D";
+                directionSetFlag = false;
+            } else if (paramDirection.equals("L") && !direction.equals("R") && directionSetFlag) {
+                direction = "L";
+                directionSetFlag = false;
+            } else if (paramDirection.equals("R") && !direction.equals("L") && directionSetFlag) {
+                direction = "R";
+                directionSetFlag = false;
+            }
+            doMove();
         }
-        doMove();
     }
+
     private void doMove(){
+
         if(direction.equals("R")){
             snake.moveRight();
             directionSetFlag = true;
@@ -230,12 +234,19 @@ public class KeyboardControlSnakePanel extends JPanel implements KeyListener, Ac
 
         //触壁死亡
         //地图的二维下标要倒转，因为蛇的x轴对应的是地图的第二个下标，y轴对应的是第一个下标
-        if(orginMapList[snakeHeadY][snakeHeadX] == 1 ){
+        try{
+            if(orginMapList[snakeHeadY][snakeHeadX] == 1 ){
 
-            System.out.println("！！！触壁死亡！！！");
-            System.out.println("orginMapList[" + snakeHeadY +"]["+snakeHeadX+"]");
-            isFaild = true;
+                System.out.println("！！！触壁死亡！！！");
+                System.out.println("orginMapList[" + snakeHeadY +"]["+snakeHeadX+"]");
+                isFaild = true;
+            }
+        }catch (Exception e){
+            System.out.println(snakeHeadY);
+            System.out.println(snakeHeadX);
+
         }
+
 
         //如果撞到自己
         for (int i = 1; i < snake.snakeNodes.size() ; i++) {
