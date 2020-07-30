@@ -23,11 +23,11 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
 
 
     /**
+     * 方向读写切换标志
      * 必须设置读写切换标志，因为快速按键会导致蛇回头咬到尾部！
-     * 比如 当前方向上UP
-     * keyPressed快速点按的时候会将方向快速的切换成Left或者Right 再切换成Down
-     * 当actionPerformed处理Snake移动时拿到了Down则处理Snake回头咬住尾部。
-     * 别问为什么，老子搞半天才发现。
+     * 比如：当前方向上UP，持续快速点按的时触发keyPressed(),会将方向快速的切换成Left或者Right，再切换成Down，以此和UP冲突。
+     * doMove()根据方向处理Snake移动时，当前方向是UP，拿到了Down，则Snake回头咬住尾部。
+     * 别问为什么，老子搞半天才发现。我佛了。
      */
     boolean directionSetFlag = true;
 
@@ -89,8 +89,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
 
             {1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1}};
 
-    Timer timer = new Timer(100, this);
-
+    Timer timer = new Timer(200, this);
 
     //构造函数
     public SnakePanel() {
@@ -206,73 +205,68 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void doMove(){
+        if(!isFaild && isStarted){
+            if(direction.equals("R")){
+                snake.moveRight();
+                directionSetFlag = true;
+            }else if(direction.equals("L")){
+                snake.moveLeft();
+                directionSetFlag = true;
+            }else if(direction.equals("U")){
+                snake.moveUp();
+                directionSetFlag = true;
+            }else if(direction.equals("D")){
+                snake.moveDown();
+                directionSetFlag = true;
+            }
 
-        if(direction.equals("R")){
-            snake.moveRight();
-            directionSetFlag = true;
-        }else if(direction.equals("L")){
-            snake.moveLeft();
-            directionSetFlag = true;
-        }else if(direction.equals("U")){
-            snake.moveUp();
-            directionSetFlag = true;
-        }else if(direction.equals("D")){
-            snake.moveDown();
-            directionSetFlag = true;
-        }
-        int snakeHeadX = snake.snakeNodes.getFirst().x;
-        int snakeHeadY = snake.snakeNodes.getFirst().y;
+            int snakeHeadX = snake.snakeNodes.getFirst().x;
+            int snakeHeadY = snake.snakeNodes.getFirst().y;
 
-        //如果吃到食物
-        if(snakeHeadX == food.x && snakeHeadY == food.y){
-            score++;
-            setFood();
-        } else {
-            //如果没有吃到食物，尾部消失，相当于整体前移
-            snake.snakeNodes.removeLast();
-        }
+            //偶尔会出现为负的情况，直接判负抛出。
+            if (snakeHeadX < 0 || snakeHeadY < 0 ){
+                isFaild = true;
+                return;
+            }
 
-        //触壁死亡
-        //地图的二维下标要倒转，因为蛇的x轴对应的是地图的第二个下标，y轴对应的是第一个下标
-        try{
+            //如果吃到食物
+            if(snakeHeadX == food.x && snakeHeadY == food.y){
+                score++;
+                setFood();
+            } else {
+                //如果没有吃到食物，尾部消失，相当于整体前移
+                snake.snakeNodes.removeLast();
+            }
+
+            //触壁死亡
+            //地图的二维下标要倒转，因为蛇的x轴对应的是地图的第二个下标，y轴对应的是第一个下标
             if(orginMapList[snakeHeadY][snakeHeadX] == 1 ){
-
                 System.out.println("！！！触壁死亡！！！");
-                System.out.println("orginMapList[" + snakeHeadY +"]["+snakeHeadX+"]");
+                //输出触壁位置
+                System.out.println("触壁位置为：[" + snakeHeadY +"]["+snakeHeadX+"]");
                 isFaild = true;
             }
-        }catch (Exception e){
-            System.out.println(snakeHeadY);
-            System.out.println(snakeHeadX);
 
-        }
-
-
-        //如果撞到自己
-        for (int i = 1; i < snake.snakeNodes.size() ; i++) {
-            if (snakeHeadX == snake.snakeNodes.get(i).x && snakeHeadY == snake.snakeNodes.get(i).y){
-                System.out.println("！！！自杀死亡！！！");
-                isFaild = true;
-                break;
+            //如果撞到自己
+            for (int i = 1; i < snake.snakeNodes.size() ; i++) {
+                if (snakeHeadX == snake.snakeNodes.get(i).x && snakeHeadY == snake.snakeNodes.get(i).y){
+                    System.out.println("！！！自杀死亡！！！");
+                    isFaild = true;
+                    break;
+                }
             }
-        }
-        if (isFaild){
-            System.out.println(snake);
-            System.out.println("！！！#######！！！");
-        }
-        repaint();
 
+            //蛇死亡时输出蛇的节点信息，以便调试。
+            if (isFaild){
+                System.out.println(snake);
+                System.out.println("！！！#######！！！");
+            }
+            repaint();
+        }
     }
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        /**
-         * 0 = KeyEvent.VK_SPACE
-         * 1 = KeyEvent.VK_UP
-         * 2 = KeyEvent.VK_DOWN
-         * 3 = KeyEvent.VK_LEFT
-         * 4 = KeyEvent.VK_RIGHT
-         */
          if(keyCode == KeyEvent.VK_SPACE){
             if(isFaild){
                 init();
@@ -297,17 +291,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        /**
-         * 0 = KeyEvent.VK_SPACE
-         * 1 = KeyEvent.VK_UP
-         * 2 = KeyEvent.VK_DOWN
-         * 3 = KeyEvent.VK_LEFT
-         * 4 = KeyEvent.VK_RIGHT
-         */
-        if(isStarted && !isFaild){
-            doMove();
-        }
+        doMove();
     }
 
     @Override
@@ -372,13 +356,15 @@ class Snake {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
+        sb.append("⪽");
         for(SnakeNode snakeNode : this.snakeNodes){
-            sb.append("[");
+            sb.append("(");
             sb.append(snakeNode.x);
             sb.append(",");
             sb.append(snakeNode.y);
-            sb.append("]<-");
+            sb.append(")");
         }
+        sb.append("⪾");
         return sb.toString();
     }
 }
