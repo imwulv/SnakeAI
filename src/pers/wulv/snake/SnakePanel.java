@@ -91,7 +91,7 @@ public class SnakePanel extends JPanel implements KeyListener, ActionListener {
 
             {1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1}};
 
-    Timer timer = new Timer(200, this);
+    Timer timer = new Timer(100, this);
 
     //构造函数
     public SnakePanel() {

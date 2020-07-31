@@ -23,30 +23,30 @@ public class Main {
         });
 
         System.out.println("#####Snake Start#####");
-        Random r = new Random();
-        new Thread(()->{
-			while (true){
-                switch (r.nextInt(4)) {
-                    case 1:
-                        snakeFrame.kcSnakePanel.settingDirection("U");
-                        break;
-                    case 2:
-                        snakeFrame.kcSnakePanel.settingDirection("D");
-                        break;
-                    case 3:
-                        snakeFrame.kcSnakePanel.settingDirection("L");
-                        break;
-                    case 0:
-                        snakeFrame.kcSnakePanel.settingDirection("R");
-                        break;
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-		}).start();
+//        Random r = new Random();
+//        new Thread(()->{
+//			while (true){
+//                switch (r.nextInt(4)) {
+//                    case 1:
+//                        snakeFrame.kcSnakePanel.settingDirection("U");
+//                        break;
+//                    case 2:
+//                        snakeFrame.kcSnakePanel.settingDirection("D");
+//                        break;
+//                    case 3:
+//                        snakeFrame.kcSnakePanel.settingDirection("L");
+//                        break;
+//                    case 0:
+//                        snakeFrame.kcSnakePanel.settingDirection("R");
+//                        break;
+//                }
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//		}).start();
 
     }
 }
