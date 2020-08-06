@@ -86,6 +86,8 @@ public class AISnakePanel extends JPanel implements Runnable {
 
     public void paint(Graphics g) {
 
+
+
         //绘制基础地图
         this.setBackground(Color.BLACK);
         g.setColor(Color.GRAY);
@@ -123,7 +125,7 @@ public class AISnakePanel extends JPanel implements Runnable {
             g.drawString("Snake "+ i +" Score: " + snake.score +" LifeTime: "+ snake.lifeTime+ " Death : " + snake.isFaild, 620, 30 * i++);
 
         }
-
+        super.paintChildren(g);
     }
 
     class MyTimerTask extends TimerTask {
