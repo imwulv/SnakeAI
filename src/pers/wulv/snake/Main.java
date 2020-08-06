@@ -31,27 +31,30 @@ public class Main {
 }
 class SnakeFrame extends JFrame {
 
-
-
-    JSplitPane jSplitPane =new JSplitPane();
+    //JSplitPane jSplitPane =new JSplitPane();
     //JPanel jPanel= new JPanel();
     JButton button = new JButton("Start AI");
 
     public SnakeFrame(AISnakePanel aiSnakePanel) throws AWTException {
-        setBounds(150,100, 900, 520);
+        setBounds(150,100, 1000, 520);
         setResizable(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //jPanel.setSize(100,40);
-        aiSnakePanel.setSize(800,520);
-        //button.setSize(100,40);
+        aiSnakePanel.setSize(1000,520);
+        aiSnakePanel.setLayout(null);
+        button.setSize(100,40);
+        setContentPane(aiSnakePanel);
+        aiSnakePanel.add(button);
+        button.setVisible(true);
+        this.setVisible(true);
 //        jSplitPane.setOneTouchExpandable(true);//让分割线显示出箭头
 //        jSplitPane.setContinuousLayout(true);//操作箭头，重绘图形
 //        jSplitPane.setDividerLocation(800);
 //        jSplitPane.setLeftComponent(aiSnakePanel);//布局中添加组件 ，面板1
 //        //jSplitPane.setRightComponent(jPanel);//添加面板2
         //setContentPane(jSplitPane);
-        setContentPane(aiSnakePanel);
+
         //jPanel.add(button);
     }
 }

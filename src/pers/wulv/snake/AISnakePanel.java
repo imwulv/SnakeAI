@@ -78,9 +78,9 @@ public class AISnakePanel extends JPanel implements Runnable {
     //构造函数
     public AISnakePanel() {
 
-        snakeList.add(new Snake(orginMapList,Color.RED,Color.RED));
-        snakeList.add(new Snake(orginMapList,Color.orange,Color.orange));
-        snakeList.add(new Snake(orginMapList,Color.CYAN,Color.CYAN));
+        snakeList.add(new Snake("snake1",orginMapList,Color.RED,Color.RED));
+        snakeList.add(new Snake("snake2",orginMapList,Color.orange,Color.orange));
+        snakeList.add(new Snake("snake3",orginMapList,Color.CYAN,Color.CYAN));
 
     }
 
@@ -112,7 +112,6 @@ public class AISnakePanel extends JPanel implements Runnable {
             for (SnakeNode snakeNode : snake.snakeNodes) {
                 g.setColor(snake.snakeColor);
                 g.fillRect(rectLength * snakeNode.x, rectLength * snakeNode.y, rectLength, rectLength);
-
             }
             //绘制食物
             g.setColor(snake.foodColor);
@@ -121,7 +120,8 @@ public class AISnakePanel extends JPanel implements Runnable {
             //绘制分数信息
             g.setColor(Color.WHITE);
             g.setFont(new Font("arial", Font.BOLD, 25));
-            g.drawString("Snake "+ i +" Score: " + snake.score, 620, 30 * i++);
+            g.drawString("Snake "+ i +" Score: " + snake.score +" LifeTime: "+ snake.lifeTime+ " Death : " + snake.isFaild, 620, 30 * i++);
+
         }
 
     }
@@ -129,6 +129,8 @@ public class AISnakePanel extends JPanel implements Runnable {
     class MyTimerTask extends TimerTask {
         @Override
         public void run() {
+
+            //⬇此部分代码将用神经网络替代。
             Random r = new Random();
             switch (r.nextInt(4)) {
                 case 1:
@@ -144,6 +146,7 @@ public class AISnakePanel extends JPanel implements Runnable {
                     snakeList.get(r.nextInt(snakeList.size())).settingDirection("R");
                     break;
             }
+            //⬆此部分代码将用神经网络替代。
             AISnakePanel.this.repaint();
         }
     }

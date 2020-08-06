@@ -5,14 +5,16 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class Snake {
+    public String snakeName ;
     public LinkedList<SnakeNode> snakeNodes = new LinkedList<SnakeNode>();
     //地图数据
     int[][] orginMapList;
     public Food food = new Food();
-    boolean isStarted = true;
-    boolean isFaild = false;
+    public boolean isStarted = true;
+    public boolean isFaild = false;
     public int score = 0;
-    int lifeTime =0;
+    public int lifeTime =0;
+    int deathLifeNum = 200;
     String direction = "R";
     public Color snakeColor ;
     public Color foodColor;
@@ -26,7 +28,8 @@ public class Snake {
     boolean directionSetFlag = true;
 
 
-    public Snake(int[][] orginMapList,Color snakecolor,Color foodColor) {
+    public Snake(String snakeName,int[][] orginMapList,Color snakecolor,Color foodColor) {
+        this.snakeName = snakeName;
         this.orginMapList = orginMapList;
         this.snakeColor = snakecolor;
         this.foodColor = foodColor;
@@ -50,6 +53,7 @@ public class Snake {
 
     public synchronized void settingDirection(String paramDirection) {
         if (!isFaild && isStarted) {
+
             if (paramDirection.equals("U") && !direction.equals("D") && directionSetFlag) {
                 direction = "U";
                 directionSetFlag = false;
@@ -63,13 +67,13 @@ public class Snake {
                 direction = "R";
                 directionSetFlag = false;
             }
-            doMove();
         }
+        doMove();
     }
 
     private void doMove(){
-        if(!isFaild && isStarted && lifeTime < 200){
 
+        if(!isFaild && isStarted && lifeTime < deathLifeNum){
             if(direction.equals("R")){
                 moveRight();
                 directionSetFlag = true;
@@ -127,6 +131,9 @@ public class Snake {
                 System.out.println("└─死亡信息─┘");
             }
             lifeTime++;
+            if (lifeTime == deathLifeNum ){
+                isFaild = true;
+            }
         }
     }
 
