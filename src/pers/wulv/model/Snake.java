@@ -1,5 +1,11 @@
 package pers.wulv.model;
 
+import pers.wulv.ai.NeuralNet;
+import pers.wulv.ai.math.IActivationFunction;
+import pers.wulv.ai.math.Linear;
+import pers.wulv.ai.math.RandomNumberGenerator;
+import pers.wulv.ai.math.Sigmoid;
+
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.Random;
@@ -10,12 +16,13 @@ public class Snake {
     //地图数据
     int[][] orginMapList;
     public Food food = new Food();
-    public boolean isStarted = true;
+    public boolean isStarted = false;
     public boolean isFaild = false;
     public int score = 0;
     public int lifeTime =0;
     int deathLifeNum = 200;
     String direction = "R";
+    int directionNum = 1;
     public Color snakeColor ;
     public Color foodColor;
     /**
@@ -27,13 +34,15 @@ public class Snake {
      */
     boolean directionSetFlag = true;
 
+    NeuralNet nn = new NeuralNet(9,4);
 
-    public Snake(String snakeName,int[][] orginMapList,Color snakecolor,Color foodColor) {
-        this.snakeName = snakeName;
-        this.orginMapList = orginMapList;
-        this.snakeColor = snakecolor;
-        this.foodColor = foodColor;
 
+    public void reset(){
+        snakeNodes.clear();
+        this.direction = "R";
+        this.isFaild = false;
+        this.isStarted = true;
+        this.lifeTime = 0;
         SnakeNode head = new SnakeNode();
         head.x = 10;
         head.y = 5;
@@ -46,11 +55,141 @@ public class Snake {
         snakeNodes.add(head);
         snakeNodes.add(body);
         snakeNodes.add(tail);
-
         setFood();
 
+
+        IActivationFunction[] hiddenAcFnc = { new Sigmoid(1.0) } ;
+        Linear outputAcFnc = new Linear(1.0);
+        System.out.println("Creating Neural Netword...");
+        nn.reset();
+        nn.setInputLayer(9);
+        nn.addHiddenLayer(10);
+        nn.addHiddenLayer(10);
+        nn.setOutputLayer(4);
+
+        System.out.println("Neural Network Network...");
+
+
+    }
+    public Snake(String snakeName,int[][] orginMapList,Color snakecolor,Color foodColor) {
+        this.snakeName = snakeName;
+        this.orginMapList = orginMapList;
+        this.snakeColor = snakecolor;
+        this.foodColor = foodColor;
+        reset();
     }
 
+    public synchronized void calc(){
+        if (!isFaild && isStarted) {
+
+            switch (direction) {
+                case "U":
+                    directionNum = 1;
+                    break;
+                case "D":
+                    directionNum = 1;
+                    break;
+                case "L":
+                    directionNum = 1;
+                    break;
+                case "R":
+                    directionNum = 1;
+                    break;
+            }
+
+            double [] neuralInput = {Double.valueOf(distanceU()),
+                    Double.valueOf(distanceD()),
+                    Double.valueOf(distanceL()),
+                    Double.valueOf(distanceR()),
+                    Double.valueOf(snakeNodes.getFirst().x),
+                    Double.valueOf(snakeNodes.getFirst().y),
+                    Double.valueOf(food.x),
+                    Double.valueOf(food.y),
+                    Double.valueOf(directionNum)};
+            nn.setInputs(neuralInput);
+            nn.calc();
+            setDirectionByNeuralNet();
+        }
+    }
+
+
+    private void setDirectionByNeuralNet(){
+        int flag = 0;
+        System.out.println("begin");
+        for (int i = 0; i < nn.getOutputs().length ; i++) {
+
+            System.out.println(i+":"+nn.getOutputs()[i]);
+            if(i + 1 == nn.getOutputs().length){break;}
+            flag = nn.getOutputs()[i] > nn.getOutputs()[i+1]? i : i+1;
+        }
+        System.out.println("end");
+        switch (flag) {
+                case 1:
+                    settingDirection("U");
+                    //System.out.println("U");
+                    break;
+                case 2:
+                    settingDirection("D");
+                    //System.out.println("D");
+                    break;
+                case 3:
+                    settingDirection("L");
+                    //System.out.println("L");
+                    break;
+                case 0:
+                    settingDirection("R");
+                    //System.out.println("R");
+                    break;
+        }
+    }
+    //距离上方障碍物距离
+    private int distanceU(){
+        int snakeHeadX = snakeNodes.getFirst().x;
+        int snakeHeadY = snakeNodes.getFirst().y;
+        int distance=0;
+        for (int i = snakeHeadY; i >= 0 ; i--) {
+            if (orginMapList[i][snakeHeadX] != 1){
+                distance++;
+            }
+        }
+        return distance;
+    }
+    //距离下方障碍物距离
+    private int distanceD(){
+        int snakeHeadX = snakeNodes.getFirst().x;
+        int snakeHeadY = snakeNodes.getFirst().y;
+        int distance=0;
+        for (int i = snakeHeadY; i < orginMapList.length ; i++) {
+            if (orginMapList[i][snakeHeadX] != 1){
+                distance++;
+            }
+        }
+        return distance;
+    }
+    //距离左方障碍物距离
+    private int distanceL(){
+        int snakeHeadX = snakeNodes.getFirst().x;
+        int snakeHeadY = snakeNodes.getFirst().y;
+        int distance=0;
+        for (int i = snakeHeadX; i >= 0 ; i--) {
+            if (orginMapList[snakeHeadY][i] != 1){
+                distance++;
+            }
+        }
+        return distance;
+    }
+    //距离右方障碍物距离
+    private int distanceR(){
+        int snakeHeadX = snakeNodes.getFirst().x;
+        int snakeHeadY = snakeNodes.getFirst().y;
+        int distance=0;
+        for (int i = snakeHeadX; i < orginMapList[0].length ; i++) {
+            if (orginMapList[snakeHeadY][i] != 1){
+                distance++;
+            }
+        }
+        return distance;
+    }
     public synchronized void settingDirection(String paramDirection) {
         if (!isFaild && isStarted) {
 

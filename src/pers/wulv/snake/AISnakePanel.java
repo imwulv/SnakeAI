@@ -3,9 +3,9 @@ package pers.wulv.snake;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.TimerTask;
 import java.util.List;
+
 import pers.wulv.model.Snake;
 import pers.wulv.model.SnakeNode;
 
@@ -79,14 +79,17 @@ public class AISnakePanel extends JPanel implements Runnable {
     public AISnakePanel() {
 
         snakeList.add(new Snake("snake1",orginMapList,Color.RED,Color.RED));
-        snakeList.add(new Snake("snake2",orginMapList,Color.orange,Color.orange));
-        snakeList.add(new Snake("snake3",orginMapList,Color.CYAN,Color.CYAN));
+//        snakeList.add(new Snake("snake2",orginMapList,Color.orange,Color.orange));
+//        snakeList.add(new Snake("snake3",orginMapList,Color.CYAN,Color.CYAN));
 
     }
 
+    public void reset(){
+        for (pers.wulv.model.Snake snake : snakeList) {
+            snake.reset();
+        }
+    }
     public void paint(Graphics g) {
-
-
 
         //绘制基础地图
         this.setBackground(Color.BLACK);
@@ -123,7 +126,6 @@ public class AISnakePanel extends JPanel implements Runnable {
             g.setColor(Color.WHITE);
             g.setFont(new Font("arial", Font.BOLD, 25));
             g.drawString("Snake "+ i +" Score: " + snake.score +" LifeTime: "+ snake.lifeTime+ " Death : " + snake.isFaild, 620, 30 * i++);
-
         }
         super.paintChildren(g);
     }
@@ -133,21 +135,27 @@ public class AISnakePanel extends JPanel implements Runnable {
         public void run() {
 
             //⬇此部分代码将用神经网络替代。
-            Random r = new Random();
-            switch (r.nextInt(4)) {
-                case 1:
-                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("U");
-                    break;
-                case 2:
-                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("D");
-                    break;
-                case 3:
-                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("L");
-                    break;
-                case 0:
-                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("R");
-                    break;
+            for (Snake snake:snakeList){
+                snake.calc();
             }
+
+
+
+//            Random r = new Random();
+//            switch (r.nextInt(4)) {
+//                case 1:
+//                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("U");
+//                    break;
+//                case 2:
+//                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("D");
+//                    break;
+//                case 3:
+//                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("L");
+//                    break;
+//                case 0:
+//                    snakeList.get(r.nextInt(snakeList.size())).settingDirection("R");
+//                    break;
+//            }
             //⬆此部分代码将用神经网络替代。
             AISnakePanel.this.repaint();
         }
@@ -155,6 +163,6 @@ public class AISnakePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        timer.schedule(new MyTimerTask(), 0, 50);
+        timer.schedule(new MyTimerTask(), 0, 100);
     }
 }
